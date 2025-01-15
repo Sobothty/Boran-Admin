@@ -46,9 +46,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData
-      ? initialData
-      : {
+    defaultValues:{
           title: "",
           description: "",
           image: "",
@@ -61,20 +59,18 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
     }
   }
   
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {   
+    console.log(values)
     try {
       setLoading(true);
-      const url = initialData
-        ? `/api/collections/${initialData._id}`
-        : "/api/collections";
-      const res = await fetch(url, {
+      const res = await fetch("/api/collections", {
         method: "POST",
         body: JSON.stringify(values),
       });
       if (res.ok) {
         setLoading(false);
-        toast.success(`Collection ${initialData ? "updated" : "created"}`);
-        window.location.href = "/collections";
+        toast.success(`Collection created`);
+        // window.location.href = "/collections";
         router.push("/collections");
       }
     } catch (err) {
@@ -91,9 +87,9 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
           <Delete id={initialData._id} item="collection" />
         </div>
       ) : (
-        <p className="text-heading2-bold">Create Collection</p>
+        <p className="text-heading2-bold text-primary">Create Collection</p>
       )}
-      <Separator className="bg-grey-1 mt-4 mb-7" />
+      <Separator className="bg-gray-200 mt-4 mb-7" />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -103,7 +99,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
               <FormItem>
                 <FormLabel>Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Title" {...field} onKeyDown={handleKeyPress} />
+                  <Input placeholder="Title" {...field} onKeyDown={handleKeyPress} className="text-primary"/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -116,7 +112,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Description" {...field} rows={5} onKeyDown={handleKeyPress} />
+                  <Textarea placeholder="Description" {...field} rows={5} onKeyDown={handleKeyPress} className="text-primary" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -140,13 +136,13 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
             )}
           />
           <div className="flex gap-10">
-            <Button type="submit" className="bg-blue-1 text-white">
+            <Button type="submit" className="bg-blue-700 text-white ">
               Submit
             </Button>
             <Button
               type="button"
               onClick={() => router.push("/collections")}
-              className="bg-blue-1 text-white"
+              className="bg-red-700 text-white"
             >
               Discard
             </Button>
