@@ -1,13 +1,14 @@
 "use client"
 import { ColumnDef } from "@tanstack/react-table"
 import  Delete  from "../custome-ui/Delete"
+import Link from "next/link"
 
 
 export const columns: ColumnDef<CollectionType>[] = [
   {
     accessorKey: "title",
     header: "Title",
-    cell: ({row}) => <p className="text-primary">{row.original.title}</p>
+    cell: ({row}) => (<Link href={`/collections/${row.original._id}`} className="text-primary hover:text-red-600">{row.original.title}</Link>)
   },
   {
     accessorKey: "prodcuts",

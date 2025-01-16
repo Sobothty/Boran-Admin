@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import { Separator } from "../ui/separator";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ interface CollectionType {
 }
 
 interface CollectionFormProps {
-  initialData?: CollectionType | null; //Must have "?" to make it optional
+  initialData?: CollectionType | null;
 }
 
 const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
@@ -46,31 +46,40 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues:{
+    defaultValues: initialData
+      ? initialData
+      : {
           title: "",
           description: "",
           image: "",
         },
   });
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement> | React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyPress = (
+    e:
+      | React.KeyboardEvent<HTMLInputElement>
+      | React.KeyboardEvent<HTMLTextAreaElement>
+  ) => {
     if (e.key === "Enter") {
       e.preventDefault();
     }
-  }
-  
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {   
-    console.log(values)
+  };
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log(values);
     try {
       setLoading(true);
-      const res = await fetch("/api/collections", {
+      const url = initialData
+        ? `/api/collections/${initialData._id}`
+        : "api/collections";
+      const res = await fetch(url, {
         method: "POST",
         body: JSON.stringify(values),
       });
       if (res.ok) {
         setLoading(false);
-        toast.success(`Collection created`);
-        // window.location.href = "/collections";
+        toast.success(`Collection${initialData ? "update" : "created"}`);
+        window.location.href = "/collections";
         router.push("/collections");
       }
     } catch (err) {
@@ -84,7 +93,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
       {initialData ? (
         <div className="flex items-center justify-between">
           <p className="text-heading2-bold">Edit Collection</p>
-          <Delete id={initialData._id} item="collection" />
+          <Delete id={initialData._id} />
         </div>
       ) : (
         <p className="text-heading2-bold text-primary">Create Collection</p>
@@ -99,7 +108,12 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
               <FormItem>
                 <FormLabel className="text-primary">Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Title" {...field} onKeyDown={handleKeyPress} className="text-primary"/>
+                  <Input
+                    placeholder="Title"
+                    {...field}
+                    onKeyDown={handleKeyPress}
+                    className="text-primary"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -112,7 +126,13 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
               <FormItem>
                 <FormLabel className="text-primary">Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Description" {...field} rows={5} onKeyDown={handleKeyPress} className="text-primary" />
+                  <Textarea
+                    placeholder="Description"
+                    {...field}
+                    rows={5}
+                    onKeyDown={handleKeyPress}
+                    className="text-primary"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -136,7 +156,10 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
             )}
           />
           <div className="flex gap-10">
-            <Button type="submit" className="bg-blue-700 text-white hover:bg-blue-900">
+            <Button
+              type="submit"
+              className="bg-blue-700 text-white hover:bg-blue-900"
+            >
               Submit
             </Button>
             <Button

@@ -19,10 +19,6 @@ export const connectToDB = async (): Promise<void> => {
     
     await mongoose.connect(process.env.MONGODB_URL, {
       dbName: "Boran_Admin",
-      // Additional recommended options
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
     });
 
     isConnected = true;
