@@ -1,5 +1,6 @@
 "use client";
-import { Tornado, Trash } from "lucide-react";
+
+import { Trash } from 'lucide-react';
 import { Button } from "../ui/button";
 import {
   AlertDialog,
@@ -13,36 +14,42 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { useState } from "react";
-import toast from "react-hot-toast";
-
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 interface DeleteProps {
-  id : string
+  id: string;
 }
-const Delete : React.FC<DeleteProps> = ({id}) => {
+
+const Delete: React.FC<DeleteProps> = ({ id }) => {
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const onDelete = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const res = await fetch(`/api/collections/${id}`, {
-        method : "DELETE",
-      })
-      if(res.ok){
-        setLoading(false)
-        window.location.href = ("/collections")
-        toast.success("Collection deleted")
+        method: "DELETE",
+      });
+      if (res.ok) {
+        router.push("/collections");
+        toast.success("Collection deleted");
+      } else {
+        throw new Error("Failed to delete");
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
       toast.error("Something went wrong! Please try again");
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
     <AlertDialog>
-      <AlertDialogTrigger>
-        <Button className="bg-red-700 hover:bg-red-600">
-          <Trash />
+      <AlertDialogTrigger asChild>
+        <Button variant="destructive" size="icon">
+          <Trash className="h-4 w-4" />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -57,10 +64,12 @@ const Delete : React.FC<DeleteProps> = ({id}) => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction className="bg-red-600 hover:bg-red-500" onClick={onDelete}>
-            <Button className="bg-red-600 hover:bg-red-500 border-none w-full">
-              Delete
-            </Button>
+          <AlertDialogAction
+            onClick={onDelete}
+            disabled={loading}
+            className="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+          >
+            {loading ? "Deleting..." : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -69,3 +78,4 @@ const Delete : React.FC<DeleteProps> = ({id}) => {
 };
 
 export default Delete;
+
