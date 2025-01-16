@@ -34,13 +34,16 @@ const Delete: React.FC<DeleteProps> = ({ id }) => {
       if (res.ok) {
         router.push("/collections");
         toast.success("Collection deleted");
+        toast.success("Collection deleted");
       } else {
         throw new Error("Failed to delete");
       }
     } catch (err) {
       console.error(err);
-      toast.error("Something went wrong! Please try again");
-    } finally {
+      toast.error("Failed to delete collection"); // Add a user-friendly error message
+    }
+    // Rest of the code remains the same
+    finally {
       setLoading(false);
     }
   };
@@ -78,4 +81,3 @@ const Delete: React.FC<DeleteProps> = ({ id }) => {
 };
 
 export default Delete;
-

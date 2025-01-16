@@ -4,6 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 import { Separator } from "../ui/separator";
 import { Button } from "@/components/ui/button";
@@ -18,14 +20,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
 import ImageUpload from "@/components/custome-ui/ImageUpload";
-import { useState } from "react";
-import toast from "react-hot-toast";
 import Delete from "@/components/custome-ui/Delete";
 
 const formSchema = z.object({
-  title: z.string().min(2).max(20),
-  description: z.string().min(2).max(500).trim(),
-  image: z.string(),
+  title: z.string().min(2, "Title must be at least 2 characters").max(20, "Title must be less than 20 characters"),
+  description: z.string().min(2, "Description must be at least 2 characters").max(500, "Description must be less than 500 characters").trim(),
+  image: z.string().min(1, "Image is required"),
 });
 
 interface CollectionType {
@@ -41,24 +41,19 @@ interface CollectionFormProps {
 
 const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
   const router = useRouter();
-
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData
-      ? initialData
-      : {
-          title: "",
-          description: "",
-          image: "",
-        },
+    defaultValues: initialData || {
+      title: "",
+      description: "",
+      image: "",
+    },
   });
 
   const handleKeyPress = (
-    e:
-      | React.KeyboardEvent<HTMLInputElement>
-      | React.KeyboardEvent<HTMLTextAreaElement>
+    e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -66,25 +61,33 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
     try {
       setLoading(true);
       const url = initialData
         ? `/api/collections/${initialData._id}`
-        : "api/collections";
+        : "/api/collections"; // Fixed URL path
+
       const res = await fetch(url, {
-        method: "POST",
+        method: initialData ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json", // Added Content-Type header
+        },
         body: JSON.stringify(values),
       });
-      if (res.ok) {
-        setLoading(false);
-        toast.success(`Collection${initialData ? "update" : "created"}`);
-        window.location.href = "/collections";
-        router.push("/collections");
+
+      if (!res.ok) {
+        const error = await res.text();
+        console.log(error)
       }
+
+      toast.success(initialData ? "Collection updated" : "Collection created");
+      router.push("/collections");
+      router.refresh();
     } catch (err) {
-      console.log("[collections_POST]", err);
-      toast.error("Something went wrong! Please try again.");
+      console.error("[Collection_Form_Error]", err);
+      toast.error(err instanceof Error ? err.message : "Something went wrong!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -159,13 +162,15 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
             <Button
               type="submit"
               className="bg-blue-700 text-white hover:bg-blue-900"
+              disabled={loading}
             >
-              Submit
+              {loading ? "Submitting..." : "Submit"}
             </Button>
             <Button
               type="button"
               onClick={() => router.push("/collections")}
               className="bg-red-700 text-white hover:bg-red-900"
+              disabled={loading}
             >
               Discard
             </Button>

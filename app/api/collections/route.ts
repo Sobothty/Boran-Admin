@@ -14,6 +14,7 @@ export const POST = async (req: NextRequest) => {
 
     await connectToDB();
     const {title, description, image} = await req.json();
+
     const existingCollection = await Collection.findOne({title});
 
     if(existingCollection) {
@@ -36,7 +37,7 @@ export const POST = async (req: NextRequest) => {
 
   } catch (err) {
     console.log("[collections_POST]", err);
-    return new NextResponse("Internal Server Error", {status: 500});
+    return new NextResponse(`Internal Server Error`, {status: 500});
   }
 };
 
@@ -54,3 +55,5 @@ export const GET = async (req: NextRequest) => {
     return new NextResponse("Internal Server Error", {status: 500});
   }
 }
+
+export const dynamic = "force-dynamic";
