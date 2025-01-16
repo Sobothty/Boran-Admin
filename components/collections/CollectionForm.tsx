@@ -91,6 +91,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
     }
   };
 
+
   return (
     <div className="p-10">
       {initialData ? (
