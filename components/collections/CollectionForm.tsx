@@ -97,7 +97,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title</FormLabel>
+                <FormLabel className="text-primary">Title</FormLabel>
                 <FormControl>
                   <Input placeholder="Title" {...field} onKeyDown={handleKeyPress} className="text-primary"/>
                 </FormControl>
@@ -110,7 +110,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description</FormLabel>
+                <FormLabel className="text-primary">Description</FormLabel>
                 <FormControl>
                   <Textarea placeholder="Description" {...field} rows={5} onKeyDown={handleKeyPress} className="text-primary" />
                 </FormControl>
@@ -123,7 +123,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
             name="image"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Image</FormLabel>
+                <FormLabel className="text-primary">Image</FormLabel>
                 <FormControl>
                   <ImageUpload
                     value={field.value ? [field.value] : []}
@@ -136,13 +136,13 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
             )}
           />
           <div className="flex gap-10">
-            <Button type="submit" className="bg-blue-700 text-white ">
+            <Button type="submit" className="bg-blue-700 text-white hover:bg-blue-900">
               Submit
             </Button>
             <Button
               type="button"
               onClick={() => router.push("/collections")}
-              className="bg-red-700 text-white"
+              className="bg-red-700 text-white hover:bg-red-900"
             >
               Discard
             </Button>

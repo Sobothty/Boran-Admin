@@ -28,7 +28,6 @@ export const POST = async (req: NextRequest) => {
         title,
         description,
         image,
-        userId, // You might want to store the userId with the collection
     });
 
     await newCollection.save();
@@ -40,3 +39,18 @@ export const POST = async (req: NextRequest) => {
     return new NextResponse("Internal Server Error", {status: 500});
   }
 };
+
+export const GET = async (req: NextRequest) => {
+  try{
+    await connectToDB()
+
+    const collections = await Collection.find().sort({ createAt : "desc"})
+
+    return NextResponse.json(collections, { status : 200 })
+
+  }
+  catch (err) {
+    console.log("[collections_POST]", err);
+    return new NextResponse("Internal Server Error", {status: 500});
+  }
+}
