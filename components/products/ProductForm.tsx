@@ -24,6 +24,7 @@ import ImageUpload from "@/components/custome-ui/ImageUpload";
 import Delete from "@/components/custome-ui/Delete";
 import { MultiText } from "../custome-ui/MultiText";
 import MultiSelect from "../custome-ui/MultiSelect";
+import Loader from "../custome-ui/Loader";
 
 const formSchema = z.object({
   title: z
@@ -51,11 +52,10 @@ interface ProductFormProps {
 
 const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [collections, setCollections] = useState<CollectionType[]>([]);
   const getCollections = async () => {
     try {
-      setLoading(true);
       const res = await fetch("/api/collections", {
         method: "GET",
       });
@@ -131,12 +131,15 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
     }
   };
 
-  return (
+  console.log("initialData", initialData);
+  console.log("collections", collections);
+
+  return loading ? <Loader/> : (
     <div className="p-10">
       {initialData ? (
         <div className="flex items-center justify-between">
           <p className="text-heading2-bold">Edit Product</p>
-          <Delete id={initialData._id} />
+          <Delete id={initialData._id} item="product"/>
         </div>
       ) : (
         <p className="text-heading2-bold text-primary">Create Product</p>
@@ -281,6 +284,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                 </FormItem>
               )}
             />
+            { collections.length > 0 && (
             <FormField
               control={form.control}
               name="collections"
@@ -305,7 +309,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            />)}
             <FormField
               control={form.control}
               name="colors"
@@ -369,7 +373,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
             </Button>
             <Button
               type="button"
-              onClick={() => router.push("/collections")}
+              onClick={() => router.push("/products")}
               className="bg-red-700 text-white hover:bg-red-900"
               disabled={loading}
             >
